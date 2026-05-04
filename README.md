@@ -31,6 +31,9 @@ under `templates/` that contain `main.tex`.
 
 - `aaai25-latex`
 - `acm-conference-latex`
+- `acmlarge`
+- `acmsmall`
 - `ieee-conference-latex`
+- `sigconf`
 
 Build artifacts and embedded VCS directories were left out of this project copy.
