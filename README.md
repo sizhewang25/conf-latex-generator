@@ -30,7 +30,6 @@ under `templates/` that contain `main.tex`.
 ## Templates
 
 - `aaai25-latex`
-- `acm-conference-latex`
 - `acmlarge`
 - `acmsmall`
 - `ieee-conference-latex`
