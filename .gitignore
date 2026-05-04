@@ -1,0 +1,25 @@
+# Archives
+*.zip
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+
+# Build outputs
+outputs/
+*.pdf
+
+# OS
+.DS_Store

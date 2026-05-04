@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+# new-latex — scaffold a LaTeX project from templates/<name>/
+#
+# Usage:
+#   new-latex                               # interactive: pick template, prompt name
+#   new-latex <project-name>                # pick template, use given name
+#   new-latex <project-name> <template>     # fully non-interactive
+#   new-latex -l | --list                   # list available templates
+#   new-latex -h | --help                   # show help
+#
+# The new project is created in the current working directory and initialized
+# as a git repository.
+
+set -euo pipefail
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+    SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+    LINK_TARGET="$(readlink "$SOURCE")"
+    if [[ "$LINK_TARGET" == /* ]]; then
+        SOURCE="$LINK_TARGET"
+    else
+        SOURCE="$SOURCE_DIR/$LINK_TARGET"
+    fi
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+TEMPLATES_DIR="$SCRIPT_DIR/templates"
+
+usage() {
+    sed -n '2,12p' "$0" | sed 's|^# \{0,1\}||'
+}
+
+# Discover templates: any subdirectory of templates/ containing main.tex
+discover_templates() {
+    [[ -d "$TEMPLATES_DIR" ]] || return 0
+    find "$TEMPLATES_DIR" -mindepth 2 -maxdepth 2 -name main.tex -type f \
+        | sed "s|/main.tex$||" \
+        | sed "s|^$TEMPLATES_DIR/||" \
+        | sort
+}
+
+TEMPLATES=()
+while IFS= read -r line; do
+    [[ -n "$line" ]] && TEMPLATES+=("$line")
+done < <(discover_templates)
+
+case "${1:-}" in
+    -h|--help)
+        usage; exit 0 ;;
+    -l|--list)
+        if (( ${#TEMPLATES[@]} == 0 )); then
+            echo "No templates found in $TEMPLATES_DIR" >&2
+            exit 1
+        fi
+        printf '%s\n' "${TEMPLATES[@]}"
+        exit 0 ;;
+esac
+
+if (( ${#TEMPLATES[@]} == 0 )); then
+    echo "No templates with main.tex found in $TEMPLATES_DIR" >&2
+    exit 1
+fi
+
+PROJECT_NAME="${1:-}"
+TEMPLATE_NAME="${2:-}"
+
+# Pick template
+if [[ -z "$TEMPLATE_NAME" ]]; then
+    echo "Available templates:"
+    for i in "${!TEMPLATES[@]}"; do
+        printf "  %d) %s\n" "$((i + 1))" "${TEMPLATES[i]}"
+    done
+    read -rp "Select template [1-${#TEMPLATES[@]}]: " choice
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#TEMPLATES[@]} )); then
+        echo "Invalid selection: $choice" >&2
+        exit 1
+    fi
+    TEMPLATE_NAME="${TEMPLATES[choice - 1]}"
+fi
+
+if [[ ! -d "$TEMPLATES_DIR/$TEMPLATE_NAME" ]]; then
+    echo "Template not found: $TEMPLATE_NAME" >&2
+    echo "Run '$(basename "$0") --list' to see available templates." >&2
+    exit 1
+fi
+
+# Pick project name
+if [[ -z "$PROJECT_NAME" ]]; then
+    read -rp "Project name: " PROJECT_NAME
+fi
+if [[ -z "$PROJECT_NAME" ]]; then
+    echo "Project name required" >&2
+    exit 1
+fi
+
+DEST="$PWD/$PROJECT_NAME"
+if [[ -e "$DEST" ]]; then
+    echo "Destination already exists: $DEST" >&2
+    exit 1
+fi
+
+# Copy the template, skipping build artifacts and VCS
+if command -v rsync >/dev/null 2>&1; then
+    rsync -a \
+        --exclude 'outputs/' \
+        --exclude '.git/' \
+        --exclude '.DS_Store' \
+        "$TEMPLATES_DIR/$TEMPLATE_NAME/" "$DEST/"
+else
+    mkdir -p "$DEST"
+    (cd "$TEMPLATES_DIR/$TEMPLATE_NAME" && \
+        find . \( -path './outputs' -o -path './.git' \) -prune -o -type f -print0 \
+        | xargs -0 -I{} sh -c 'mkdir -p "$0/$(dirname "$1")" && cp -p "$1" "$0/$1"' "$DEST" {})
+fi
+mkdir -p "$DEST/outputs"
+
+GIT_STATUS="Skipped git init: git not found"
+if command -v git >/dev/null 2>&1; then
+    git -C "$DEST" init -q
+    GIT_STATUS="Initialized git repository"
+fi
+
+echo "Created: $DEST"
+echo "From template: $TEMPLATE_NAME"
+echo "$GIT_STATUS"
+echo
+echo "Next:"
+echo "  cd $PROJECT_NAME && latexmk"

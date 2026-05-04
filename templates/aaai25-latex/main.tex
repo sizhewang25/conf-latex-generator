@@ -1,0 +1,98 @@
+%%% AAAI-25 paper template
+%%% Switch between camera-ready and anonymous submission by toggling the
+%%% \usepackage{aaai25} line below.
+%%%
+%%% AAAI rules: do not modify aaai25.sty, do not use \input (submission must
+%%% be a single .tex file), do not use hyperref/geometry/etc.
+
+\documentclass[letterpaper]{article}
+\usepackage{aaai25}              % camera-ready
+% \usepackage[submission]{aaai25}  % anonymous submission (double-blind)
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage[hyphens]{url}
+\usepackage{graphicx}
+\urlstyle{rm}
+\def\UrlFont{\rm}
+\usepackage{natbib}
+\usepackage{caption}
+\frenchspacing
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+
+% Optional: algorithms. Remove if unused.
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% Optional: listings. Remove if unused.
+\usepackage{newfloat}
+\usepackage{listings}
+\DeclareCaptionStyle{ruled}{labelfont=normalfont,labelsep=colon,strut=off}
+\lstset{%
+    basicstyle={\footnotesize\ttfamily},
+    numbers=left,numberstyle=\footnotesize,xleftmargin=2em,
+    aboveskip=0pt,belowskip=0pt,
+    showstringspaces=false,tabsize=2,breaklines=true}
+\floatstyle{ruled}
+\newfloat{listing}{tb}{lst}{}
+\floatname{listing}{Listing}
+
+\pdfinfo{
+/TemplateVersion (2025.1)
+}
+
+\setcounter{secnumdepth}{0} % 1 for section numbers, 2 for section+subsection
+
+% Title must be Title Case (Chicago style).
+\title{TODO: Paper Title}
+\author{
+    First Author\textsuperscript{\rm 1},
+    Second Author\textsuperscript{\rm 2}
+}
+\affiliations{
+    \textsuperscript{\rm 1}Department, University\\
+    \textsuperscript{\rm 2}Department, University\\
+    first@example.edu, second@example.edu
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+TODO: Abstract. No citations, footnotes, or math here.
+\end{abstract}
+
+% Optional: link to code, datasets, extended version.
+% \begin{links}
+%     \link{Code}{https://example.com/code}
+%     \link{Datasets}{https://example.com/datasets}
+% \end{links}
+
+\section{Introduction}
+\label{sec:intro}
+TODO: Introduction.
+
+\section{Related Work}
+\label{sec:related}
+TODO: Related work.
+
+\section{Methodology}
+\label{sec:methodology}
+TODO: Methodology.
+
+\section{Experiments}
+\label{sec:experiments}
+TODO: Experiments.
+
+\section{Conclusion}
+\label{sec:conclusion}
+TODO: Conclusion.
+
+\section*{Acknowledgments}
+TODO: Acknowledgments.
+
+\bibliography{references}
+
+\end{document}
